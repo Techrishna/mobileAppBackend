@@ -11,13 +11,13 @@ router.get('/', function(req, res, next) {
 
 router.post('/signup', function(req, res, next){
 	model.Users.signup(req.body, function(response){
-		res.json({success: true, user: response});
+		res.json(response);
 	});
 });
 
 router.post('/signup-leader', function(req, res, next){
 	model.Users.signup_for_leader(req.body, function(response){
-		res.json({success: true, user: response});
+		res.json(response);
 	});
 });
 

@@ -8,7 +8,7 @@ var pool;
 var options = {
         host     : 'localhost',
         user     : 'root',
-        password : '',
+        password : 'admin',
         database : 'techrishna'
       };
 
