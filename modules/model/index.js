@@ -71,9 +71,107 @@ var Projects = seq.define('projects', {
         tableName : 'projects'
 });
 
+var Complaints = seq.define('complaints', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    title: Sequelize.TEXT('long'),
+    description: Sequelize.TEXT('long'),
+    creation_time: Sequelize.DATE(6)
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'complaints'
+});
+
+var Suggestions = seq.define('suggestions', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    title : Sequelize.TEXT('long'),
+    description: Sequelize.TEXT('long'),
+    creation_time: Sequelize.DATE(6)
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'suggestions'
+});
+
+var Gyapans = seq.define('gyapan', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    title : Sequelize.TEXT('long'),
+    description: Sequelize.TEXT('long'),
+    creation_time: Sequelize.DATE(6)
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'gyapans'
+});
+
+var Biography = seq.define('biography', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    description: Sequelize.TEXT('long'),
+    image_url: Sequelize.TEXT('long')
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'gyapans'
+});
+
+var Speeches = seq.define('speeches', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    title: Sequelize.TEXT('long'),
+    speech_url: Sequelize.TEXT('long')
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'speeches'
+});
+
+var Videos = seq.define('videos', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    title: Sequelize.TEXT('long'),
+    video_url: Sequelize.TEXT('long')
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'videos'
+});
+
+
+var Photos = seq.define('photos', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    title: Sequelize.TEXT('long'),
+    video_url: Sequelize.TEXT('long')
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'photos'
+});
+
 Commitments.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Projects.belongsTo(Leader, {foreignKey: "leader_id"})
+
+Complaints.belongsTo(Leader, {foreignKey: "leader_id"})
+
+Gyapans.belongsTo(Gyapans, {foreignKey: "leader_id"})
+
+Speeches.belongsTo(Speeches, {foreignKey: "leader_id"})
+
+Videos.belongsTo(Videos, {foreignKey: "leader_id"})
+
+Photos.belongsTo(Photos, {foreignKey: "leader_id"})
 
 seq.sync();
 
@@ -81,5 +179,11 @@ module.exports = {
     Users : User,
     Leaders : Leader,
     Commitments : Commitments,
-    Projects : Projects
+    Projects : Projects,
+    Complaints : Complaints,
+    Suggestions : Suggestions,
+    Gyapans : Gyapans,
+    Speeches : Speeches,
+    Videos : Videos,
+    Photos : Photos
 }

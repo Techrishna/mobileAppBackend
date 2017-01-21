@@ -11,15 +11,30 @@ router.get('/', function(req, res, next) {
 
 router.post('/signup', function(req, res, next){
 	model.Users.signup(req.body, function(response){
-		res.json({success: true, user: response});
+		res.json(response);
 	});
 });
 
 router.post('/signup-leader', function(req, res, next){
 	model.Users.signup_for_leader(req.body, function(response){
-		res.json({success: true, user: response});
+		res.json(response);
 	});
 });
+
+router.post('/login', function(req, res, next){
+	model.Users.login(req.body, function(response){
+		res.json(response);
+	});
+});
+
+
+router.get('/get_leaders_data', function(req, res, next) {
+	model.Users.get_leaders_data(req.query, function(response) {
+		res.json(response);
+	});
+});
+
+
 
 //here create the apis
 
