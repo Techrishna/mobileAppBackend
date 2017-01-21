@@ -44,14 +44,14 @@ module.exports = function () {
             if(resp) {
                 if(resp.password != pass)
                     return cb({status: 1, err: "Password doesn't match"});
-                resp.user_type = true;
-                return cb({status: 1, data: resp});
+                data_resp.set('user_type', true, {'raw': true});
+                return cb({status: 1, data: data_resp});
             } else {
                 model.Leaders.findOne({where : {email : data.email}}).then(function(resp){
                     if(resp) {
                         if(resp.password != pass)
                             return cb({status: 1, err : "Password doesn't match"});
-                        resp.user_type = false;
+                        data_resp.set('user_type', false, {'raw': true});
                         return cb({status: 1, data: resp});
                     } else {
                         return cb({status: 0, err: "User not exist"});
