@@ -44,9 +44,19 @@ module.exports = function () {
             if(resp) {
                 if(resp.password != pass)
                     return cb({status: 1, err: "Password doesn't match"});
+                resp.user_type = true;
                 return cb({status: 1, data: resp});
             } else {
-                return cb({status: 0, err: "User not exist"});
+                model.Leaders.findOne({where : {email : data.email}}).then(function(resp){
+                    if(resp) {
+                        if(resp.password != pass)
+                            return cb({status: 1, err : "Password doesn't match"});
+                        resp.user_type = false;
+                        return cb({status: 1, data: resp});
+                    } else {
+                        return cb({status: 0, err: "User not exist"});
+                    }
+                });
             }
         });
     }
