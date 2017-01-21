@@ -23,7 +23,7 @@ module.exports = function () {
                     updated_at : new Date().getTime()
                 }).then(function(resp) {
                     console.log('user created successfully');
-                    return cb({status:1, user : resp});
+                    return cb({status:1, data : resp});
                 }).catch(function(err) {
                     console.log('user creation error');
                     console.log(err);
