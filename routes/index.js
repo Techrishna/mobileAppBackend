@@ -21,6 +21,21 @@ router.post('/signup-leader', function(req, res, next){
 	});
 });
 
+router.post('/login', function(req, res, next){
+	model.Users.login(req.body, function(response){
+		res.json(response);
+	});
+});
+
+
+router.get('/get_leaders_data', function(req, res, next) {
+	model.Users.get_leaders_data(req.query, function(response) {
+		res.json(response);
+	});
+});
+
+
+
 //here create the apis
 
 module.exports = router;

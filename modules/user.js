@@ -38,6 +38,29 @@ module.exports = function () {
 
     }
 
+    this.login = function(data, cb) {
+        var pass = encrypt(data.password);
+        model.Users.findOne({where: {email: data.email}}).then(function(resp){
+            if(resp) {
+                if(resp.password != pass)
+                    return cb({status: 1, err: "Password doesn't match"});
+                return cb({status: 1, data: resp});
+            } else {
+                return cb({status: 0, err: "User not exist"});
+            }
+        });
+    }
+
+    this.get_leaders_data = function(data, cb) {
+        model.Leaders.findAll().then(function(resp){
+            if(resp) {
+                return cb({status: 1, data : resp});
+            } else {
+                return cb({status: 0, err: "No Record Found"});
+            }
+        });
+    }
+
     function encrypt(text) {
         var cipher = crypto.createCipher('aes-256-cbc', 'd6F3Efeq')
         var crypted = cipher.update(text, 'utf8', 'hex')
