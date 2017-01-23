@@ -35,6 +35,12 @@ router.get('/get_leaders_data', function(req, res, next) {
 });
 
 
+router.post('/post_vote', function(req, res, next) {
+	model.Users.update_votes(req.body, function(response) {
+		res.json(response);
+	});
+});
+
 
 //here create the apis
 

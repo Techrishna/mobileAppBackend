@@ -71,6 +71,21 @@ module.exports = function () {
         });
     }
 
+    this.update_votes = function(data, cb) {
+        model.Votes.create({
+            created_at : new Date().getTime(),
+            user_id : data.user,
+            leader_id : data.leader
+        }).then(function(resp){
+            console.log('voted successfully');
+            return cb({status:1, data : resp.id + ""});
+        }).catch(function(err){
+            console.log('vote creation error');
+            console.log(err);
+            return cb({status: 0, err: err});
+        })
+    }
+
     function encrypt(text) {
         var cipher = crypto.createCipher('aes-256-cbc', 'd6F3Efeq')
         var crypted = cipher.update(text, 'utf8', 'hex')
