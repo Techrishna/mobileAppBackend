@@ -159,6 +159,17 @@ var Photos = seq.define('photos', {
         tableName : 'photos'
 });
 
+var Votes = seq.define('votes', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    created_at : Sequelize.DATE(6)
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'votes'
+});
+
 Commitments.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Projects.belongsTo(Leader, {foreignKey: "leader_id"})
@@ -173,6 +184,10 @@ Videos.belongsTo(Videos, {foreignKey: "leader_id"})
 
 Photos.belongsTo(Photos, {foreignKey: "leader_id"})
 
+Votes.belongsTo(User, {foreignKey: "user_id"})
+
+Votes.belongsTo(Leader, {foreignKey: "leader_id"})
+
 seq.sync();
 
 module.exports = {
@@ -185,5 +200,6 @@ module.exports = {
     Gyapans : Gyapans,
     Speeches : Speeches,
     Videos : Videos,
-    Photos : Photos
+    Photos : Photos,
+    Votes : Votes
 }
