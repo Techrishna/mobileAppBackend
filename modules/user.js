@@ -7,30 +7,58 @@ require('sequelize-values')(Sequelize);
 module.exports = function () {
     this.signup = function(data, cb) {
         var pass = encrypt(data.password);
-        model.Users.findOne({where: {email: data.email}}).then(function(resp){
-            if(resp){
-                return cb({status:1, err:'User already exists'});
-            } else {
-                var newUser = model.Users.create({
-                    name : data.name,
-                    email : data.email,
-                    password : pass,
-                    address : data.address,
-                    mobile : data.mobile,
-                    city : data.city,
-                    state : data.state,
-                    created_at : new Date().getTime(),
-                    updated_at : new Date().getTime()
-                }).then(function(resp) {
-                    console.log('user created successfully');
-                    return cb({status:1, user : resp});
-                }).catch(function(err) {
-                    console.log('user creation error');
-                    console.log(err);
-                    return cb({status: 0, err: err});
-                });
-            }
-        });
+        if(data.leader){
+            model.Leaders.findOne({where: {email: data.email}}).then(function(resp){
+                if(resp){
+                    return cb({status:1, err:'User already exists'});
+                } else {
+                    var newUser = model.Leaders.create({
+                        name : data.name,
+                        email : data.email,
+                        password : pass,
+                        address : data.address,
+                        mobile : data.mobile,
+                        city : data.city,
+                        state : data.state,
+                        created_at : new Date().getTime(),
+                        updated_at : new Date().getTime()
+                    }).then(function(resp) {
+                        console.log('leader created successfully');
+                        resp.set('user_type', false, {raw : true});
+                        return cb({status:1, user : resp});
+                    }).catch(function(err) {
+                        console.log('leader creation error');
+                        console.log(err);
+                        return cb({status: 0, err: err});
+                    });
+                }
+            });
+        } else {
+            model.Users.findOne({where: {email: data.email}}).then(function(resp){
+                if(resp){
+                    return cb({status:1, err:'User already exists'});
+                } else {
+                    var newUser = model.Users.create({
+                        name : data.name,
+                        email : data.email,
+                        password : pass,
+                        address : data.address,
+                        mobile : data.mobile,
+                        city : data.city,
+                        state : data.state,
+                        created_at : new Date().getTime(),
+                        updated_at : new Date().getTime()
+                    }).then(function(resp) {
+                        console.log('user created successfully');
+                        return cb({status:1, user : resp});
+                    }).catch(function(err) {
+                        console.log('user creation error');
+                        console.log(err);
+                        return cb({status: 0, err: err});
+                    });
+                }
+            });
+        }
     }
 
     this.signup_for_leader = function(data, cb) {
@@ -67,6 +95,16 @@ module.exports = function () {
                 return cb({status: 1, data : resp});
             } else {
                 return cb({status: 0, err: "No Record Found"});
+            }
+        });
+    }
+
+    this.get_leader_data_by_id = function(data, leader_id, cb) {
+        model.Leaders.find({id: leader_id}).then(function(resp) {
+            if(resp) {
+                return cb({status: 1, data : resp});
+            } else {
+                return cb({status: 0, err: "No record found"});
             }
         });
     }
