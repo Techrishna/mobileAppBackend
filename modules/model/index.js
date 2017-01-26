@@ -176,13 +176,15 @@ Projects.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Complaints.belongsTo(Leader, {foreignKey: "leader_id"})
 
-Gyapans.belongsTo(Gyapans, {foreignKey: "leader_id"})
+Gyapans.belongsTo(Leader, {foreignKey: "leader_id"})
 
-Speeches.belongsTo(Speeches, {foreignKey: "leader_id"})
+Biography.belongsTo(Leader, {foreignKey: "leader_id"})
 
-Videos.belongsTo(Videos, {foreignKey: "leader_id"})
+Speeches.belongsTo(Leader, {foreignKey: "leader_id"})
 
-Photos.belongsTo(Photos, {foreignKey: "leader_id"})
+Videos.belongsTo(Leader, {foreignKey: "leader_id"})
+
+Photos.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Votes.belongsTo(User, {foreignKey: "user_id"})
 
@@ -201,5 +203,6 @@ module.exports = {
     Speeches : Speeches,
     Videos : Videos,
     Photos : Photos,
-    Votes : Votes
+    Votes : Votes,
+    Biography : Biography
 }

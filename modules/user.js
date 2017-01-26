@@ -109,6 +109,16 @@ module.exports = function () {
         });
     }
 
+    this.get_biography_data_by_id = function(data, leader_id, cb) {
+        model.Biography.find({leader_id: leader_id}).then(function(resp) {
+            if(resp) {
+                return cb({status: 1, data : resp});
+            } else {
+                return cb({status: 0, err: "No record found"});
+            }
+        });
+    }
+
     this.update_votes = function(data, cb) {
         model.Votes.create({
             created_at : new Date().getTime(),
