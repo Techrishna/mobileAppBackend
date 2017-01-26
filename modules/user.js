@@ -72,6 +72,8 @@ module.exports = function () {
     }
 
     this.update_votes = function(data, cb) {
+        if(!data.user_id || data.leader_id)
+            return cb({status:0, err: 'some error occurred'}); 
         model.Votes.create({
             created_at : new Date().getTime(),
             user_id : data.user,
