@@ -350,6 +350,41 @@ module.exports = function () {
         })
     };
 
+    this.edit_biography = function(data, cb) {
+        if(!data.leader_id)
+            return cb({status:0, err: 'some error occurred'}); 
+        model.Biography.findOne({where:{leader_id: data.leader_id}}).then(function(resp){
+            if(resp){
+                resp.description = data.description;
+                resp.image_url = data.image;
+                resp.updated_at = new Date().getTime();
+                resp.save().then(function(){
+                    model.Biography.findOne({where:{leader_id: data.leader_id}}).then(function(resp){
+                        if(resp){
+                            console.log("Biography saved");
+                            return cb({status: 1, data: resp});
+                        }
+                    });
+                });
+            } else {
+                model.Biography.create({
+                    created_at : new Date().getTime(),
+                    updated_at : new Date().getTime(),
+                    description : data.description,
+                    image_url : data.image,
+                    leader_id : data.leader_id
+                }).then(function(resp){
+                    console.log("successfully created biography");
+                    return cb({statusL: 1, data: resp});
+                }).catch(function(err){
+                    console.log('biography creation error');
+                    console.log(err);
+                    return cb({status: 0, err: err});
+                })
+            }
+        })
+    };
+
     this.edit_commitment = function(data, cb) {
         if(!data.id)
             return cb({status:0, err: 'some error occurred'});
