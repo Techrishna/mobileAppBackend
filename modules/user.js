@@ -355,13 +355,13 @@ module.exports = function () {
     this.edit_biography = function(data, cb) {
         if(!data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
-        model.Biography.findOne({where:{leader_id: data.leader_id}}).then(function(resp){
+        model.Biography.findOne({where:{leader_id: data.leader_id}, include: [{model: model.Leaders}]}).then(function(resp){
             if(resp){
                 resp.description = data.description;
                 resp.image_url = data.image;
                 resp.updated_at = new Date().getTime();
                 resp.save().then(function(){
-                    model.Biography.findOne({where:{leader_id: data.leader_id}}).then(function(resp){
+                    model.Biography.findOne({where:{leader_id: data.leader_id}, include:[{model: model.Leaders}]}).then(function(resp){
                         if(resp){
                             console.log("Biography saved");
                             return cb({status: 1, data: resp});
@@ -377,7 +377,13 @@ module.exports = function () {
                     leader_id : data.leader_id
                 }).then(function(resp){
                     console.log("successfully created biography");
-                    return cb({statusL: 1, data: resp});
+                    model.Biography.find({where: {leader_id: data.leader_id}, include: [{model: model.Leaders}]}).then(function(resp){
+                        if(resp_f){
+                            return cb({statusL: 1, data: resp_f});
+                        } else {
+                            return cb({status: 0, err: "Date not found"});
+                        }
+                    });
                 }).catch(function(err){
                     console.log('biography creation error');
                     console.log(err);
