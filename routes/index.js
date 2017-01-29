@@ -125,6 +125,12 @@ router.post('/add_commit', function(req, res, next){
 	})
 })
 
+router.post('/edit_biography', function(req, res, next){
+	model.Users.edit_biography(req.body, function(response){
+		res.json(response);
+	});	
+})
+
 router.post('/edit_commit', function(req, res, next){
 	model.Users.edit_commitment(req.body, function(response){
 		res.json(response);

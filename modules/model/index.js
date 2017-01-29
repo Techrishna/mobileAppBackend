@@ -116,7 +116,9 @@ var Gyapans = seq.define('gyapan', {
 var Biography = seq.define('biography', {
     id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
     description: Sequelize.TEXT('long'),
-    image_url: Sequelize.TEXT('long')
+    image_url: Sequelize.TEXT('long'),
+    created_at : Sequelize.DATE(6),
+    updated_at :Sequelize.DATE(6)
     }, 
     {
         timestamps : false,
