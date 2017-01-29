@@ -213,6 +213,8 @@ Rating.belongsTo(User, {foreignKey: "user_id"})
 
 Rating.belongsTo(Leader, {foreignKey: "leader_id"})
 
+Suggestions.belongsTo(Leader, {foreignKey: "leader_id"})
+
 seq.sync();
 
 module.exports = {

@@ -96,6 +96,44 @@ module.exports = function () {
         });
     }
 
+    this.get_home_page = function(data, id, cb) {
+        async.parallel([
+            function(callback) {
+                model.Complaints.findAll({where:{leader_id: id}}).then(function(resp){
+                    if(resp) {
+                        callback(null, resp);
+                    } else {
+                        callback("No Record Found");
+                    }
+                });
+            }, function(callback) {
+                model.Gyapans.findAll({where: {leader_id: id}}).then(function(resp){
+                    if(resp) {
+                        callback(null, resp);
+                    } else {
+                        callback("No Record Found");
+                    }
+                });
+            }, function(callback) {
+                model.Suggestions.findAll({where:{leader_id: id}}).then(function(resp){
+                    if(resp) {
+                        callback(null, resp);
+                    } else {
+                        callback("No Record Found");
+                    }
+                });
+            }
+        ], function(err, response){
+            if(err) {
+                console.log("some err occurred");
+                return cb({status:0, err: err});
+            } else {
+                return cb({status:1, comp_list:response[0], gyapan_list:response[1], suggestion_list:response[2]});
+            }
+
+        });
+    }
+
     this.get_leader_data_by_id = function(data, leader_id, cb) {
         model.Leaders.find({where:{id: leader_id}}).then(function(resp) {
             if(resp) {
