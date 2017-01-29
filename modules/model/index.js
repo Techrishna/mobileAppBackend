@@ -34,6 +34,7 @@ var Leader = seq.define('leaders', {
     state : Sequelize.TEXT('long'),
     dob : Sequelize.DATE(6),
     created_at : Sequelize.DATE(6),
+    party : Sequelize.TEXT('long'),
     updated_at : Sequelize.DATE(6)
     },
     {
@@ -47,7 +48,9 @@ var Leader = seq.define('leaders', {
 var Commitments = seq.define('commitments', {
     id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true },
     photo_url : Sequelize.TEXT('long'),
-    text : Sequelize.TEXT('long')
+    text : Sequelize.TEXT('long'),
+    title : Sequelize.TEXT('long'),
+    created_at : Sequelize.DATE(6)
     },
     {
         timestamps : false,
@@ -61,8 +64,8 @@ var Projects = seq.define('projects', {
     id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true },
     title : Sequelize.TEXT('long'),
     description : Sequelize.TEXT('long'),
-    photo_url : Sequelize.TEXT('long')
-
+    photo_url : Sequelize.TEXT('long'),
+    created_at : Sequelize.DATE(6)
     }, 
     {
         timestamps : false,
@@ -170,11 +173,25 @@ var Votes = seq.define('votes', {
         tableName : 'votes'
 });
 
+var Rating = seq.define('rating', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    created_at : Sequelize.DATE(6),
+    rating: Sequelize.INTEGER
+    }, 
+    {
+        timestamps : false,
+        paranoid : false,
+        freezeTableName : true,
+        tableName : 'rating'
+})
+
 Commitments.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Projects.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Complaints.belongsTo(Leader, {foreignKey: "leader_id"})
+
+Complaints.belongsTo(User, {foreignKey: "user_id"})
 
 Gyapans.belongsTo(Leader, {foreignKey: "leader_id"})
 
@@ -190,6 +207,10 @@ Votes.belongsTo(User, {foreignKey: "user_id"})
 
 Votes.belongsTo(Leader, {foreignKey: "leader_id"})
 
+Rating.belongsTo(User, {foreignKey: "user_id"})
+
+Rating.belongsTo(Leader, {foreignKey: "leader_id"})
+
 seq.sync();
 
 module.exports = {
@@ -204,5 +225,6 @@ module.exports = {
     Videos : Videos,
     Photos : Photos,
     Votes : Votes,
-    Biography : Biography
+    Biography : Biography,
+    Rating : Rating
 }
