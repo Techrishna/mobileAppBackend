@@ -7,7 +7,7 @@ require('sequelize-values')(Sequelize);
 module.exports = function () {
     this.signup = function(data, cb) {
         var pass = encrypt(data.password);
-        if(data.leader){
+        if(data.leader=="true"){
             model.Leaders.findOne({where: {email: data.email}}).then(function(resp){
                 if(resp){
                     return cb({status:1, err:'User already exists'});
@@ -53,7 +53,7 @@ module.exports = function () {
                     }).then(function(resp) {
                         console.log('user created successfully');
                         resp.set('user_type', true, {raw : true});
-                        return cb({status:1, user : resp});
+                        return cb({status:1, data : resp});
                     }).catch(function(err) {
                         console.log('user creation error');
                         console.log(err);
@@ -343,7 +343,7 @@ module.exports = function () {
             photo_url : data.image
         }).then(function(resp){
             console.log('complaint created successfully');
-            return cb({status:1, data : resp.id + ""});
+            return cb({status:1, data : resp});
         }).catch(function(err){
             console.log('complaint creation error');
             console.log(err);
@@ -429,7 +429,7 @@ module.exports = function () {
             photo_url : data.image
         }).then(function(resp){
             console.log('project created successfully');
-            return cb({status:1, data : resp.id + ""});
+            return cb({status:1, data : resp});
         }).catch(function(err){
             console.log('project creation error');
             console.log(err);
