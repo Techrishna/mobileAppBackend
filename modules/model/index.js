@@ -44,7 +44,7 @@ var Leader = seq.define('leaders', {
 
 });
 
-var Commitments = seq.define('biography', {
+var Commitments = seq.define('commitments', {
     id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true },
     photo_url : Sequelize.TEXT('long'),
     text : Sequelize.TEXT('long')
@@ -119,7 +119,7 @@ var Biography = seq.define('biography', {
         timestamps : false,
         paranoid : false,
         freezeTableName : true,
-        tableName : 'gyapans'
+        tableName : 'biography'
 });
 
 var Speeches = seq.define('speeches', {

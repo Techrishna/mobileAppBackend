@@ -24,8 +24,9 @@ module.exports = function () {
                         updated_at : new Date().getTime()
                     }).then(function(resp) {
                         console.log('leader created successfully');
+                        console.log(resp);
                         resp.set('user_type', false, {raw : true});
-                        return cb({status:1, user : resp});
+                        return cb({status:1, data : resp});
                     }).catch(function(err) {
                         console.log('leader creation error');
                         console.log(err);
@@ -50,7 +51,7 @@ module.exports = function () {
                         updated_at : new Date().getTime()
                     }).then(function(resp) {
                         console.log('user created successfully');
-                        return cb({status:1, user : resp});
+                        return cb({status:1, data : resp});
                     }).catch(function(err) {
                         console.log('user creation error');
                         console.log(err);
@@ -100,7 +101,8 @@ module.exports = function () {
     }
 
     this.get_leader_data_by_id = function(data, leader_id, cb) {
-        model.Leaders.find({id: leader_id}).then(function(resp) {
+        console.log(leader_id);
+        model.Leaders.findOne({where: {id: leader_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -110,6 +112,7 @@ module.exports = function () {
     }
 
     this.get_biography_data_by_id = function(data, leader_id, cb) {
+        console.log(model.Biography);
         model.Biography.find({leader_id: leader_id}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
