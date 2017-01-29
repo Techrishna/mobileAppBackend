@@ -119,7 +119,7 @@ module.exports = function () {
     
 
     this.get_biography_data_by_id = function(data, leader_id, cb) {
-        model.Biography.find({where:{leader_id: leader_id}}).then(function(resp) {
+        model.Biography.find({where:{leader_id: leader_id},include: [{model: model.Leaders}]}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -376,7 +376,7 @@ module.exports = function () {
                     leader_id : data.leader_id
                 }).then(function(resp){
                     console.log("successfully created biography");
-                    model.Biography.find({where: {leader_id: data.leader_id}, include: [{model: model.Leaders}]}).then(function(resp){
+                    model.Biography.find({where: {leader_id: data.leader_id}, include: [{model: model.Leaders}]}).then(function(resp_f){
                         if(resp_f){
                             return cb({statusL: 1, data: resp_f});
                         } else {

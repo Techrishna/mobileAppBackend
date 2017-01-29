@@ -34,7 +34,7 @@ router.post('/login', function(req, res, next){
 });
 
 
-router.get('/get_leaders_data/:party', function(req, res, next) {
+router.get('/get_leaders_data_party/:party', function(req, res, next) {
 	model.Users.get_leaders_data(req.query, req.params.party, function(response) {
 		res.json(response);
 	});
