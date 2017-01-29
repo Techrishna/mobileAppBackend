@@ -128,7 +128,7 @@ module.exports = function () {
     }
 
     this.get_commitments_data_by_id = function(data, leader_id, cb) {
-        model.Commitments.find({where:{leader_id: leader_id}}).then(function(resp) {
+        model.Commitments.findAll({where:{leader_id: leader_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -138,7 +138,7 @@ module.exports = function () {
     }
 
     this.get_projects_data_by_id = function(data, leader_id, cb) {
-        model.Projects.find({where:{leader_id: leader_id}}).then(function(resp) {
+        model.Projects.findAll({where:{leader_id: leader_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -148,7 +148,7 @@ module.exports = function () {
     }
     
     this.get_videos_data_by_id = function(data, leader_id, cb) {
-        model.Videos.find({where:{leader_id: leader_id}}).then(function(resp) {
+        model.Videos.findAll({where:{leader_id: leader_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -158,7 +158,7 @@ module.exports = function () {
     }
 
     this.get_photos_data_by_id = function(data, leader_id, cb) {
-        model.Photos.find({where:{leader_id: leader_id}}).then(function(resp) {
+        model.Photos.findAll({where:{leader_id: leader_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -168,7 +168,7 @@ module.exports = function () {
     }
 
     this.get_speech_data_by_id = function(data, leader_id, cb) {
-        model.Speeches.find({where:{leader_id: leader_id}}).then(function(resp) {
+        model.Speeches.findAll({where:{leader_id: leader_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -178,7 +178,7 @@ module.exports = function () {
     }
 
     this.get_leader_rating = function(data, leader_id, user_id, cb) {
-        model.Rating.find({where:{leader_id: leader_id, user_id: user_id}}).then(function(resp) {
+        model.Rating.findOne({where:{leader_id: leader_id, user_id: user_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
