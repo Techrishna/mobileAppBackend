@@ -7,7 +7,7 @@ require('sequelize-values')(Sequelize);
 module.exports = function () {
     this.signup = function(data, cb) {
         var pass = encrypt(data.password);
-        if(data.leader){
+        if(data.leader=="true"){
             model.Leaders.findOne({where: {email: data.email}}).then(function(resp){
                 if(resp){
                     return cb({status:1, err:'User already exists'});
@@ -25,8 +25,9 @@ module.exports = function () {
                         party : data.party
                     }).then(function(resp) {
                         console.log('leader created successfully');
+                        console.log(resp);
                         resp.set('user_type', false, {raw : true});
-                        return cb({status:1, user : resp});
+                        return cb({status:1, data : resp});
                     }).catch(function(err) {
                         console.log('leader creation error');
                         console.log(err);
@@ -52,7 +53,7 @@ module.exports = function () {
                     }).then(function(resp) {
                         console.log('user created successfully');
                         resp.set('user_type', true, {raw : true});
-                        return cb({status:1, user : resp});
+                        return cb({status:1, data : resp});
                     }).catch(function(err) {
                         console.log('user creation error');
                         console.log(err);
@@ -128,14 +129,14 @@ module.exports = function () {
                 console.log("some err occurred");
                 return cb({status:0, err: err});
             } else {
-                return cb({status:1, comp_list:response[0], gyapan_list:response[1], suggestion_list:response[2]});
+                return cb({status:1, data:{comp_list:response[0], gyapan_list:response[1], suggestion_list:response[2]}});
             }
 
         });
     }
 
     this.get_leader_data_by_id = function(data, leader_id, cb) {
-        model.Leaders.find({where:{id: leader_id}}).then(function(resp) {
+        model.Leaders.findOne({where: {id: leader_id}}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -156,7 +157,7 @@ module.exports = function () {
     
 
     this.get_biography_data_by_id = function(data, leader_id, cb) {
-        model.Biography.find({where:{leader_id: leader_id}}).then(function(resp) {
+        model.Biography.find({where:{leader_id: leader_id},include: [{model: model.Leaders}]}).then(function(resp) {
             if(resp) {
                 return cb({status: 1, data : resp});
             } else {
@@ -263,7 +264,7 @@ module.exports = function () {
     }
 
     this.update_votes = function(data, cb) {
-        if(!data.user_id || data.leader_id)
+        if(!data.user_id || !data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
         model.Votes.create({
             created_at : new Date().getTime(),
@@ -386,7 +387,7 @@ module.exports = function () {
             photo_url : data.image
         }).then(function(resp){
             console.log('complaint created successfully');
-            return cb({status:1, data : resp.id + ""});
+            return cb({status:1, data : resp});
         }).catch(function(err){
             console.log('complaint creation error');
             console.log(err);
@@ -419,7 +420,7 @@ module.exports = function () {
                     leader_id : data.leader_id
                 }).then(function(resp){
                     console.log("successfully created biography");
-                    model.Biography.find({where: {leader_id: data.leader_id}, include: [{model: model.Leaders}]}).then(function(resp){
+                    model.Biography.find({where: {leader_id: data.leader_id}, include: [{model: model.Leaders}]}).then(function(resp_f){
                         if(resp_f){
                             return cb({statusL: 1, data: resp_f});
                         } else {
@@ -472,7 +473,7 @@ module.exports = function () {
             photo_url : data.image
         }).then(function(resp){
             console.log('project created successfully');
-            return cb({status:1, data : resp.id + ""});
+            return cb({status:1, data : resp});
         }).catch(function(err){
             console.log('project creation error');
             console.log(err);
