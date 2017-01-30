@@ -3,6 +3,8 @@ var crypto = require('crypto');
 var async = require('async');
 var Sequelize = require('sequelize');
 require('sequelize-values')(Sequelize);
+var db = require('./db');
+sequelize = db.seqConn;
 
 module.exports = function () {
     this.signup = function(data, cb) {
@@ -505,6 +507,30 @@ module.exports = function () {
                 });
             }
         })
+    }
+
+    this.get_all_news = function(data, category, cb) {
+        if(category==null){
+            model.News.findAll().then(function(resp){
+                return cb({status: 1, data: resp});
+            });
+        } else {
+            model.News.findAll({where:{category: category}}).then(function(resp){
+                return cb({status: 1, data: resp});
+            });
+        }
+    }
+
+    this.get_all_news_category = function(data, cb) {
+        sequelize.query('select distinct category from news').spread(function(resp, metadata){
+            console.log(data);
+            var order = Sequelize.getValues(resp);
+            var data = [];
+            for(var i=0; i <order.length; i++){
+                data.push(order[i]["category"]);
+            }
+            return cb({status: 1, data: data});
+        });
     }
 
     this.delete_project = function(data, cb) {
