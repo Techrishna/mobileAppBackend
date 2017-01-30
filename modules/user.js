@@ -327,7 +327,10 @@ module.exports = function () {
                             resp.updated_at = new Date().getTime();
                             resp.save().then(function(){
                                 console.log("saved successfully");
-                                return cb({status:1, data: "saved"});
+                                model.Leaders.findOne({where: {id: data.id}}).then(function(resp_user){
+                                    resp_user.set('user_type', false, {raw : true});
+                                    return cb({status:1, data: resp_user});
+                                });
                                 //console.log("some error occurred" + err);
                                 //return cb({status:0, err: err});
                             });
@@ -354,7 +357,10 @@ module.exports = function () {
                             resp.updated_at = new Date().getTime();
                             resp.save().then(function(){
                                 console.log("saved successfully");
-                                return cb({status:1, data: "saved"});
+                                model.Leaders.findOne({where: {id: data.id}}).then(function(resp_user){
+                                    resp_user.set('user_type', true, {raw : true});
+                                    return cb({status:1, data: resp_user});
+                                });
                                 //console.log("some error occurred" + err);
                                 //return cb({status:0, err: err});
                             });
