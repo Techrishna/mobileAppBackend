@@ -107,6 +107,24 @@ router.get('/get_leaders_home_page/:id', function(req, res, next) {
 	});
 })
 
+router.get('/get_all_news/:id', function(req, res, next) {
+	model.Users.get_all_news(req.query, req.params.id, function(response){
+		res.json(response);
+	});
+})
+
+router.get('/get_all_news', function(req, res, next) {
+	model.Users.get_all_news(req.query, null, function(response){
+		res.json(response);
+	});
+})
+
+router.get('/get_all_news_category', function(req, res, next) {
+	model.Users.get_all_news_category(req.query,  function(response){
+		res.json(response);
+	});
+});
+
 router.post('/post_vote', function(req, res, next) {
 	model.Users.update_votes(req.body, function(response) {
 		res.json(response);
