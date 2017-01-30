@@ -88,13 +88,23 @@ module.exports = function () {
     }
 
     this.get_leaders_data = function(data, party, cb) {
-        model.Leaders.findAll({where:{party: party}}).then(function(resp){
-            if(resp) {
-                return cb({status: 1, data : resp});
-            } else {
-                return cb({status: 0, err: "No Record Found"});
-            }
-        });
+        if(party==null){
+            model.Leaders.findAll().then(function(resp){
+                if(resp) {
+                    return cb({status: 1, data : resp});
+                } else {
+                    return cb({status: 0, err: "No Record Found"});
+                }
+            });
+        } else {
+            model.Leaders.findAll({where:{party: party}}).then(function(resp){
+                if(resp) {
+                    return cb({status: 1, data : resp});
+                } else {
+                    return cb({status: 0, err: "No Record Found"});
+                }
+            });
+        }
     }
 
     this.get_home_page = function(data, id, cb) {
