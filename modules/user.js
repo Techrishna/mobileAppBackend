@@ -317,7 +317,7 @@ module.exports = function () {
         if(data.leader=="true"){
             model.Leaders.findOne({where:{id:data.id}}).then(function(resp){
                 if(resp){
-                    model.Leaders.findOne({where:{email: data.email}}).then(function(resp_l){
+                    model.Leaders.findOne({where:{email: data.email, id:{$ne: resp.id}}}).then(function(resp_l){
                         if(!resp_l){
                             resp.name = data.name;
                             resp.email = data.email;
@@ -343,7 +343,7 @@ module.exports = function () {
         } else {
             model.Users.findOne({where:{id:data.id}}).then(function(resp){
                 if(resp){
-                    model.Users.findOne({where : {email : data.email}}).then(function(resp_u){
+                    model.Users.findOne({where : {email : data.email, id:{$ne: resp.id}}}).then(function(resp_u){
                         if(!resp_u) {
                             resp.name = data.name;
                             resp.email = data.email;
