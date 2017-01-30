@@ -40,6 +40,12 @@ router.get('/get_leaders_data_party/:party', function(req, res, next) {
 	});
 });
 
+router.get('/get_leaders_data_party', function(req, res, next) {
+	model.Users.get_leaders_data(req.query, null, function(response) {
+		res.json(response);
+	});
+});
+
 router.get('/get_user_data/:id', function(req, res, next) {
 	model.Users.find_user_by_id(req.query, req.params.id, function(response){
 		res.json(response);
