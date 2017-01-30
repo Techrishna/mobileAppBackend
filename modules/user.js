@@ -129,7 +129,7 @@ module.exports = function () {
                 console.log("some err occurred");
                 return cb({status:0, err: err});
             } else {
-                return cb({status:1, comp_list:response[0], gyapan_list:response[1], suggestion_list:response[2]});
+                return cb({status:1, data:{comp_list:response[0], gyapan_list:response[1], suggestion_list:response[2]}});
             }
 
         });
@@ -264,7 +264,7 @@ module.exports = function () {
     }
 
     this.update_votes = function(data, cb) {
-        if(!data.user_id || data.leader_id)
+        if(!data.user_id || !data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
         model.Votes.create({
             created_at : new Date().getTime(),
