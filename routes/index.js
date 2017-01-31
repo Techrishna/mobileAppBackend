@@ -101,6 +101,12 @@ router.get('/get_leader_rating_by_user/:lid/:id', function(req, res, next) {
 	});
 });
 
+router.get('/get_leader_voting_by_user/:lid/:id', function(req, res, next) {
+	model.Users.get_leader_voting(req.query, req.params.lid, req.params.id, function(response){
+		res.json(response);
+	});
+});
+
 router.get('/get_leaders_home_page/:id', function(req, res, next) {
 	model.Users.get_home_page(req.query, req.params.id, function(response){
 		res.json(response);

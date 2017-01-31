@@ -99,7 +99,7 @@ module.exports = function () {
                 }
             });
         } else {
-            model.Leaders.findAll({where:{party: party}}).then(function(resp){
+            model.Leaders.findAll({where:{party: party}})   .then(function(resp){
                 if(resp) {
                     return cb({status: 1, data : resp});
                 } else {
@@ -238,6 +238,16 @@ module.exports = function () {
         });
     }
 
+    this.get_leader_voting = function(data, leader_id, user_id, cb) {
+        model.Votes.findOne({where:{leader_id: leader_id, user_id: user_id}}).then(function(resp) {
+            if(resp) {
+                return cb({status: 1, data : "true"});
+            } else {
+                return cb({status: 0, data: "false"});
+            }
+        });
+    }
+
     this.insert_complaint = function(data, cb) {
         if(!data.user_id || data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
@@ -258,38 +268,55 @@ module.exports = function () {
     }
 
     this.insert_rating = function(data, cb) {
-        if(!data.user_id || data.leader_id)
+        if(!data.user_id || !data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
-        model.Rating.create({
-            created_at : new Date().getTime(),
-            user_id : data.user_id,
-            leader_id : data.leader_id,
-            rating : data.rating
-        }).then(function(resp){
-            console.log('complaint created successfully');
-            return cb({status:1, data : resp.id + ""});
-        }).catch(function(err){
-            console.log('complaint creation error');
-            console.log(err);
-            return cb({status: 0, err: err});
-        })
+        model.Rating.findOne({where:{user_id: data.user_id, leader_id: data.leader_id}}).then(function(resp){
+            if(!resp){
+                model.Rating.create({
+                    created_at : new Date().getTime(),
+                    user_id : data.user_id,
+                    leader_id : data.leader_id,
+                    rating : data.rating
+                }).then(function(resp){
+                    console.log('complaint created successfully');
+                    return cb({status:1, data : resp.id + ""});
+                }).catch(function(err){
+                    console.log('complaint creation error');
+                    console.log(err);
+                    return cb({status: 0, err: err});
+                })
+            } else {
+                resp.rating = data.rating;
+                resp.save().then(function(){
+                    return cb({status: 1, data: resp.id+""});
+                });
+            }
+        });
     }
 
     this.update_votes = function(data, cb) {
         if(!data.user_id || !data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
-        model.Votes.create({
-            created_at : new Date().getTime(),
-            user_id : data.user_id,
-            leader_id : data.leader_id
-        }).then(function(resp){
-            console.log('voted successfully');
-            return cb({status:1, data : resp.id + ""});
-        }).catch(function(err){
-            console.log('vote creation error');
-            console.log(err);
-            return cb({status: 0, err: err});
-        })
+        model.Votes.findOne({where:{user_id: data.user_id, leader_id: data.leader_id}}).then(function(resp){
+            if(!resp) {
+                model.Votes.create({
+                    created_at : new Date().getTime(),
+                    user_id : data.user_id,
+                    leader_id : data.leader_id
+                }).then(function(resp){
+                    console.log('voted successfully');
+                    return cb({status:1, data : "voted"});
+                }).catch(function(err){
+                    console.log('vote creation error');
+                    console.log(err);
+                    return cb({status: 0, err: err});
+                })
+            } else {
+                resp.destroy().then(function(){
+                    return cb({status:1, data: "removed"});
+                });
+            }
+        });
     }
 
     this.reset_password = function(data, cb) {
