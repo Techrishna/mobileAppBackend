@@ -50,7 +50,13 @@ router.get('/get_user_data/:id', function(req, res, next) {
 	model.Users.find_user_by_id(req.query, req.params.id, function(response){
 		res.json(response);
 	})
-});	
+});
+
+router.get('/get_advertisements', function(req, res, next) {
+	model.Users.get_all_advertisement(req.query, function(response){
+		res.json(response);
+	})
+});
 
 router.get('/get_leaders_data/:id', function(req, res, next) {
 	model.Users.get_leader_data_by_id(req.query, req.params.id, function(response){

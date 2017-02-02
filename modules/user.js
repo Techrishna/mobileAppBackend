@@ -563,6 +563,12 @@ module.exports = function () {
         }
     }
 
+    this.get_all_advertisement = function(data, cb) {
+        model.Advertisement.findAll().then(function(resp){
+            return cb({status: 1, data: resp});
+        });
+    }
+
     this.get_all_voting = function(data, leader, cb) {
         if(!leader)
             return cb({status:0, err: "leader id missing"});

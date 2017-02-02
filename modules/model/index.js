@@ -201,6 +201,18 @@ var News = seq.define('news', {
         tableName : 'news'
 });
 
+var Advertisement = seq.define('advertisement', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    creation_time : Sequelize.DATE(6),
+    imgUrl : Sequelize.TEXT('long')
+    },
+    {
+        timestamps : false,
+        paranoid: false,
+        freezeTableName : true,
+        tableName : 'advertisement'
+});
+
 Commitments.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Projects.belongsTo(Leader, {foreignKey: "leader_id"})
@@ -245,5 +257,6 @@ module.exports = {
     Votes : Votes,
     Biography : Biography,
     Rating : Rating,
-    News : News
+    News : News,
+    Advertisement: Advertisement
 }
