@@ -548,6 +548,34 @@ module.exports = function () {
         }
     }
 
+    this.get_all_rating = function(data, leader, cb) {
+        if(!leader)
+            return cb({status:0, err: "leader id missing"});
+        else {
+            sequelize.query('select avg(rating) as average from rating where leader_id=' + leader).spread(function(resp, metadata){
+                console.log(data);
+                var data = Sequelize.getValues(resp);
+                var rating = data[0]["average"];
+                if(rating==null)
+                    rating = 0
+                return cb({status:1, data: rating});
+            });
+        }
+    }
+
+    this.get_all_voting = function(data, leader, cb) {
+        if(!leader)
+            return cb({status:0, err: "leader id missing"});
+        else {
+            sequelize.query('select count(*) as count from votes where leader_id=' + leader).spread(function(resp, metadata){
+                console.log(data);
+                var data = Sequelize.getValues(resp);
+                var votes = data[0]["count"];
+                return cb({status:1, data: votes});
+            });
+        }
+    }
+
     this.get_all_news_category = function(data, cb) {
         sequelize.query('select distinct category from news').spread(function(resp, metadata){
             console.log(data);
