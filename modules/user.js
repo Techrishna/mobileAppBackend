@@ -231,7 +231,7 @@ module.exports = function () {
     this.get_leader_rating = function(data, leader_id, user_id, cb) {
         model.Rating.findOne({where:{leader_id: leader_id, user_id: user_id}}).then(function(resp) {
             if(resp) {
-                return cb({status: 1, data : resp});
+                return cb({status: 1, data : resp.rating});
             } else {
                 return cb({status: 0, err: "No record found"});
             }
@@ -249,10 +249,10 @@ module.exports = function () {
     }
 
     this.insert_complaint = function(data, cb) {
-        if(!data.user_id || data.leader_id)
+        if(!data.user_id || !data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
         model.Complaints.create({
-            created_at : new Date().getTime(),
+            creation_time : new Date().getTime(),
             user_id : data.user_id,
             leader_id : data.leader_id,
             title : data.title,
@@ -397,7 +397,7 @@ module.exports = function () {
                             resp.updated_at = new Date().getTime();
                             resp.save().then(function(){
                                 console.log("saved successfully");
-                                model.Leaders.findOne({where: {id: data.id}}).then(function(resp_user){
+                                model.Users.findOne({where: {id: data.id}}).then(function(resp_user){
                                     resp_user.set('user_type', true, {raw : true});
                                     return cb({status:1, data: resp_user});
                                 });
