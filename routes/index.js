@@ -58,6 +58,18 @@ router.get('/get_leaders_data/:id', function(req, res, next) {
 	});
 });
 
+router.get('/get_voting_data_leader/:id', function(req, res, next) {
+	model.Users.get_all_voting(req.query, req.params.id, function(response){
+		res.json(response);
+	});
+});
+
+router.get('/get_rating_data_leader/:id', function(req, res, next) {
+	model.Users.get_all_rating(req.query, req.params.id, function(response){
+		res.json(response);
+	});
+});
+
 
 router.get('/get_biography_data_by_id/:id', function(req, res, next) {
 	model.Users.get_biography_data_by_id(req.query, req.params.id, function(response){
