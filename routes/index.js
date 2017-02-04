@@ -209,6 +209,12 @@ router.post('/edit_project', function(req, res, next){
 	})
 })
 
+router.post("/post_photo", function(req, res, next){
+	model.Users.add_photo(req.body, function(response){
+		res.json(response);
+	});
+});
+
 router.post('/delete_project', function(req, res, next){
 	model.Users.delete_project(req.body, function(response){
 		res.json(response);
