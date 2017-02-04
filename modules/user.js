@@ -434,6 +434,23 @@ module.exports = function () {
         })
     };
 
+    this.add_photo = function(data, cb) {
+        if(!data.leader_id)
+            return cb({status:0, err: 'some error occurred'}); 
+        model.Photos.create({
+            title : data.title,
+            leader_id : data.leader_id,
+            video_url : data.image
+        }).then(function(resp){
+            console.log('photo created successfully');
+            return cb({status:1, data : resp});
+        }).catch(function(err){
+            console.log('photo creation error');
+            console.log(err);
+            return cb({status: 0, err: err});
+        })
+    };
+
     this.edit_biography = function(data, cb) {
         if(!data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
