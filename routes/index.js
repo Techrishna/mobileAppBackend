@@ -227,6 +227,12 @@ router.post('/delete_project', function(req, res, next){
 	})
 })
 
+router.post('/delete_photo', function(req, res, next){
+	model.Users.delete_photo(req.body, function(response){
+		res.json(response);
+	})
+})
+
 
 //here create the apis
 

@@ -509,6 +509,16 @@ module.exports = function () {
         })
     }
 
+    this.delete_photo = function(data, cb) {
+        if(!data.id)
+            return cb({status:0, err: 'some error occurred'});
+        model.Photos.destroy({where:{id: data.id}}).then(function(resp){
+            if(resp){
+                return cb({status: 1, data: "deleted"});
+            }
+        })
+    }
+
     this.add_project = function(data, cb) {
         if(!data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
