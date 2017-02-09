@@ -14,7 +14,8 @@ var User = seq.define('users', {
     city : Sequelize.TEXT('long'),
     state : Sequelize.TEXT('long'),
     created_at : Sequelize.DATE(6),
-    updated_at : Sequelize.DATE(6)
+    updated_at : Sequelize.DATE(6),
+    verified : {type : Sequelize.BOOLEAN, defaultValue: false}
     },
     {
         timestamps : false,
@@ -35,7 +36,8 @@ var Leader = seq.define('leaders', {
     dob : Sequelize.DATE(6),
     created_at : Sequelize.DATE(6),
     party : Sequelize.TEXT('long'),
-    updated_at : Sequelize.DATE(6)
+    updated_at : Sequelize.DATE(6),
+    verified : {type : Sequelize.BOOLEAN, defaultValue: false}
     },
     {
         timestamps : false,
@@ -156,7 +158,7 @@ var Photos = seq.define('photos', {
     id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
     title: Sequelize.TEXT('long'),
     video_url: Sequelize.TEXT('long')
-    }, 
+    },
     {
         timestamps : false,
         paranoid : false,
@@ -213,6 +215,32 @@ var Advertisement = seq.define('advertisement', {
         tableName : 'advertisement'
 });
 
+var VerificationKeys = seq.define('verification', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    temp_key : Sequelize.TEXT('long'),
+    user_id : Sequelize.INTEGER,
+    leader_id : Sequelize.INTEGER
+    },
+    {
+        timestamps : false,
+        paranoid: false,
+        freezeTableName : true,
+        tableName : 'verification_table'
+});
+
+var ResetPasswordKeys = seq.define('password', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    temp_key: Sequelize.TEXT('long'),
+    user_id : Sequelize.INTEGER,
+    leader_id : Sequelize.INTEGER
+    },
+    {
+        timestamps : false,
+        paranoid: false,
+        freezeTableName : true,
+        tableName : 'password_reset_table'
+})
+
 Commitments.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Projects.belongsTo(Leader, {foreignKey: "leader_id"})
@@ -258,5 +286,7 @@ module.exports = {
     Biography : Biography,
     Rating : Rating,
     News : News,
-    Advertisement: Advertisement
+    Advertisement: Advertisement,
+    ResetPasswordKeys : ResetPasswordKeys,
+    VerificationKeys : VerificationKeys
 }
