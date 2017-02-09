@@ -5,6 +5,8 @@ var Sequelize = require('sequelize');
 require('sequelize-values')(Sequelize);
 var db = require('./db');
 sequelize = db.seqConn;
+var mailer = require('./mailer.js');
+var randomstring = require('randomstring');
 
 module.exports = function () {
     this.signup = function(data, cb) {
@@ -14,27 +16,38 @@ module.exports = function () {
                 if(resp){
                     return cb({status:1, err:'User already exists'});
                 } else {
-                    var newUser = model.Leaders.create({
-                        name : data.name,
-                        email : data.email,
-                        password : pass,
-                        address : data.address,
-                        mobile : data.mobile,
-                        city : data.city,
-                        state : data.state,
-                        created_at : new Date().getTime(),
-                        updated_at : new Date().getTime(),
-                        party : data.party
-                    }).then(function(resp) {
-                        console.log('leader created successfully');
-                        console.log(resp);
-                        resp.set('user_type', false, {raw : true});
-                        return cb({status:1, data : resp});
-                    }).catch(function(err) {
-                        console.log('leader creation error');
-                        console.log(err);
-                        return cb({status: 0, err: err});
-                    });
+                    model.Users.findOne({where: {email: data.email}}).then(function(resp_u){
+                        if(resp_u){
+                            return cb({status: 1, err: "User already exists"});
+                        } else {
+                            var newUser = model.Leaders.create({
+                                name : data.name,
+                                email : data.email,
+                                password : pass,
+                                address : data.address,
+                                mobile : data.mobile,
+                                city : data.city,
+                                state : data.state,
+                                created_at : new Date().getTime(),
+                                updated_at : new Date().getTime(),
+                                party : data.party
+                            }).then(function(resp) {
+                                console.log('leader created successfully');
+                                resp.set('user_type', false, {raw : true});
+                                sendVerificationMail(resp, false, function(err, resp_mail){
+                                    if(err){
+                                        return cb({status: 1, err: err});
+                                    } else {
+                                        return cb({status: 1, data: resp})
+                                    }
+                                });
+                            }).catch(function(err) {
+                                console.log('leader creation error');
+                                console.log(err);
+                                return cb({status: 0, err: err});
+                            });
+                        }
+                    })
                 }
             });
         } else {
@@ -42,28 +55,124 @@ module.exports = function () {
                 if(resp){
                     return cb({status:1, err:'User already exists'});
                 } else {
-                    var newUser = model.Users.create({
-                        name : data.name,
-                        email : data.email,
-                        password : pass,
-                        address : data.address,
-                        mobile : data.mobile,
-                        city : data.city,
-                        state : data.state,
-                        created_at : new Date().getTime(),
-                        updated_at : new Date().getTime()
-                    }).then(function(resp) {
-                        console.log('user created successfully');
-                        resp.set('user_type', true, {raw : true});
-                        return cb({status:1, data : resp});
-                    }).catch(function(err) {
-                        console.log('user creation error');
-                        console.log(err);
-                        return cb({status: 0, err: err});
+                    model.Leaders.findOne({where: {email: data.email}}).then(function(resp_u){
+                        if(resp_u){
+                            return cb({status:1, err:'User already exists'});
+                        } else {
+                            var newUser = model.Users.create({
+                                name : data.name,
+                                email : data.email,
+                                password : pass,
+                                address : data.address,
+                                mobile : data.mobile,
+                                city : data.city,
+                                state : data.state,
+                                created_at : new Date().getTime(),
+                                updated_at : new Date().getTime()
+                            }).then(function(resp) {
+                                console.log('user created successfully');
+                                resp.set('user_type', true, {raw : true});
+                                sendVerificationMail(resp, true, function(err, resp_mail){
+                                    if(err){
+                                        return cb({status: 1, err: err});
+                                    } else {
+                                        return cb({status: 1, data: resp})
+                                    }
+                                });
+                            }).catch(function(err) {
+                                console.log('user creation error');
+                                console.log(err);
+                                return cb({status: 0, err: err});
+                            });
+                        }
                     });
                 }
             });
         }
+    }
+
+    this.verifyUser = function(data, cb){
+        if(data.email){
+            getUserAccount(data, function(err, resp){
+                if(!err){
+                    model.VerificationKeys.findOne({where: {temp_key: data.temp_key, $or: [{leader_id: resp.id}, {user_id: resp.id}]}}).then(function(resp){
+                        if(resp){
+                            console.log(resp.leader_id);
+                            if(resp && resp.leader_id){
+                                console.log('here');
+                                model.Leaders.findOne({where: {id: resp.leader_id}}).then(function(resp_l){
+                                    if(resp_l){
+                                        resp_l.verified = true;
+                                        resp_l.save().then(function(){
+                                            return cb({status: 1, data: "verified"});
+                                        })
+                                    } else {
+                                        return cb({status: 1, err: "User not exist"});
+                                    }
+                                });
+                            } else if(resp && resp.user_id){
+                                model.Users.findOne({where: {id: resp.user_id}}).then(function(resp_u){
+                                    if(resp_u){
+                                        resp_u.verified = true;
+                                        resp_u.save().then(function(){
+                                            return cb({status: 1, data: "verified"});
+                                        })
+                                    } else {
+                                        return cb({status: 1, err: "User not exist"});
+                                    }
+                                });
+                            } else {
+                                return cb({status: 0, err: "Key not found"});
+                            }
+                        }
+                    });
+                } else {
+                    return cb({status: 0, err: "User not found"});
+                }  
+            });
+        } else {
+            model.VerificationKeys.findOne({where: {temp_key: data.temp_key, $or: [{leader_id: data.id}, {user_id: data.id}]}}).then(function(resp){
+                if(resp){
+                    if(resp && resp.leader_id){
+                        model.Leaders.findOne({where: {id: resp.leader_id}}).then(function(resp_l){
+                            if(resp_l){
+                                resp_l.verified = true;
+                                resp_l.save().then(function(){
+                                    return cb({status: 1, data: "verified"});
+                                })
+                            }
+                        });
+                    } else if(resp && resp.user_id){
+                        model.Leaders.findOne({where: {id: resp.leader_id}}).then(function(resp_u){
+                            if(resp_u){
+                                resp_u.verified = true;
+                                resp_u.save().then(function(){
+                                    return cb({status: 1, data: "verified"});
+                                })
+                            }
+                        });
+                    } else {
+                        return cb({status: 0, err: "Key not found"});
+                    }
+                }
+            });
+        }
+    }
+
+    var getUserAccount = function(data, callback) {
+        model.Users.findOne({where: {email : data.email}}).then(function(resp){
+            if(resp){
+                callback(null, resp);
+            } else {
+                model.Leaders.findOne({where: {email: data.email}}).then(function(resp_l){
+                    if(resp_l){
+                        callback(null, resp_l);
+                    } else{
+                        callback("User not found");
+                    }
+                })
+            }
+        })
     }
 
     this.login = function(data, cb) {
@@ -73,14 +182,20 @@ module.exports = function () {
                 if(resp.password != pass)
                     return cb({status: 1, err: "Password doesn't match"});
                 resp.set('user_type', true, {'raw': true});
-                return cb({status: 1, data: resp});
+                if(resp.verified)
+                    return cb({status: 1, data: resp});
+                else
+                    return cb({status: 1, err: "Verification Failed"});
             } else {
                 model.Leaders.findOne({where : {email : data.email}}).then(function(resp){
                     if(resp) {
                         if(resp.password != pass)
                             return cb({status: 1, err : "Password doesn't match"});
                         resp.set('user_type', false, {'raw': true});
-                        return cb({status: 1, data: resp});
+                        if(resp.verified)
+                            return cb({status: 1, data: resp});
+                        else
+                            return cb({status: 1, err: "Verification Failed"});
                     } else {
                         return cb({status: 0, err: "User not exist"});
                     }
@@ -321,35 +436,43 @@ module.exports = function () {
 
     this.reset_password = function(data, cb) {
         var pass = encrypt(data.password);
-        if(data.user_type=="true"){
-            model.Leaders.findOne({where:{id:data.id}}).then(function(resp){
-                if(resp){
-                    resp.password = pass;
-                    resp.save().then(function(){
-                            console.log("saved successfully");
-                            return cb({status:1, data: "saved"});
-                            //console.log("some error occurred" + err);
-                            //return cb({status:0, err: err});
+        model.ResetPasswordKeys.findOne({where: {temp_key: data.temp_key}}).then(function(resp_key){
+            if(resp_key){
+                if(resp_key.leader_id){
+                    model.Leaders.findOne({where:{id:resp_key.leader_id}}).then(function(resp){
+                        if(resp){
+                            resp.password = pass;
+                            resp.save().then(function(){
+                                console.log("saved successfully");
+                                return cb({status:1, data: "saved"});
+                                //console.log("some error occurred" + err);
+                                //return cb({status:0, err: err});
+                            });
+                        } else {
+                            return cb({"status" : 1, "err": "No User Found"});
+                        }
+                    });
+                } else if(resp_key.user_id){
+                    model.Users.findOne({where:{id:resp_key.user_id}}).then(function(resp){
+                        if(resp){
+                            resp.password = pass;
+                            resp.save().then(function(){
+                                console.log("saved successfully");
+                                return cb({status:1, data: "saved"});
+                                //console.log("some error occurred" + err);
+                                //return cb({status:0, err: err});
+                            });
+                        } else {
+                            return cb({status:0, data: "No User found"});
+                        }
                     });
                 } else {
-                    return cb({"status" : 1, "err": "No User Found"});
+                    return cb({"status": 1, "err" : "Key Doesn't Match"});
                 }
-            });
-        } else {
-            model.Users.findOne({where:{id:data.id}}).then(function(resp){
-                if(resp){
-                    resp.password = pass;
-                    resp.save().then(function(){
-                            console.log("saved successfully");
-                            return cb({status:1, data: "saved"});
-                            //console.log("some error occurred" + err);
-                            //return cb({status:0, err: err});
-                    });
-                } else {
-                    return cb({status:0, data: "No User found"});
-                }
-            });
-        }
+            } else {
+                return cb({"status": 1, "err" : "Key Doesn't Match"});
+            }
+        });
     }
 
     this.update = function(data, cb) {
@@ -643,8 +766,140 @@ module.exports = function () {
             if(resp){
                 return cb({status: 1, data: "deleted"});
             }
+        });
+    }
+
+    this.sendMailForVerification = function(data, cb) {
+        model.Users.findOne({where : {email: data.email}}).then(function(resp){
+            if(resp){
+                new_data = {};
+                new_data['user_type'] = true;
+                new_data['id'] = resp.id;
+                new_data['email'] = resp.email;
+                console.log(new_data);
+                sendVerificationMail(new_data, true, function(err, response){
+                    if(err){
+                        console.log('some err occurred sending verification');
+                        console.log(err);
+                        cb({status: 0, err: err});
+                    } else {
+                        console.log('verification done');
+                        cb({status: 1, data: 'mail sent'});
+                    }
+                });
+            } else {
+                model.Leaders.findOne({where : {email: data.email}}).then(function(resp_l){
+                    if(resp_l){
+                        new_data = {};
+                        new_data['user_type'] = false;
+                        new_data['id'] = resp_l.id;
+                        new_data['email'] = resp_l.email;
+                        console.log(new_data);
+                        sendVerificationMail(new_data, false, function(err, response){
+                            if(err){
+                                console.log('some err occurred sending verification');
+                                console.log(err);
+                                cb({status:0, err: err});
+                            } else {
+                                console.log('verification done');
+                                cb({status: 1, data: 'mail sent'});
+                            }
+                        });
+                    } else {
+                        console.log('No User found');
+                        cb({status: 0, err: "No user found"});
+                    }
+                });
+            }
+        });
+    }
+
+    var sendVerificationMail = function(data, user_type, cb) {
+        if(user_type){
+            model.VerificationKeys.destroy({where:{user_id: data.id}}).then(function(){
+                model.VerificationKeys.create({
+                    temp_key : randomstring.generate(8),
+                    user_id : data.id
+                }).then(function(resp) {
+                    console.log('verification key created successfully');
+                    console.log(resp);
+                    mailer.sendMail('admin@techrishna.co.in', data.email, "Verification Mail from Techrishna", "Hi /n/n Kindly verify your mail with the following key : \n" + resp.temp_key);
+                    return cb(null, resp);
+                }).catch(function(err) {
+                    console.log('verification key creation error');
+                    console.log(err);
+                    return cb(err);
+                });
+            });
+        } else {
+            model.VerificationKeys.destroy({where:{leader_id: data.id}}).then(function(){
+                model.VerificationKeys.create({
+                    temp_key : randomstring.generate(8),
+                    leader_id : data.id
+                }).then(function(resp) {
+                    console.log('verification key created successfully');
+                    console.log(resp);
+                    mailer.sendMail('admin@techrishna.co.in', data.email, "Verification Mail from Techrishna", "Hi /n/n Kindly verify your mail with the following key : \n" + resp.temp_key);
+                    return cb(null, resp);
+                }).catch(function(err) {
+                    console.log('verification key creation error');
+                    console.log(err);
+                    return cb(err);
+                });  
+            });
+        }
+    }
+
+    this.sendtemp = function(data, cb) {
+        mailer.sendMail('admin@techrishna.co.in', "gaurav.jp2@gmail.com", "temp mail", "Hi Test");
+        return cb({status:1});
+    }
+
+    this.sendResetPasswordMail = function(data, cb) {
+        console.log(data);
+        model.Users.findOne({where: {email : data.email}}).then(function(resp){
+            if(resp){
+                model.ResetPasswordKeys.destroy({where: {user_id: resp.id}}).then(function(){
+                    model.ResetPasswordKeys.create({
+                        temp_key : randomstring.generate(8),
+                        user_id : resp.id
+                    }).then(function(response){
+                        console.log('verification key created successfully');
+                        console.log(resp);
+                        mailer.sendMail('admin@techrishna.co.in', data.email, "Reset Password Techrishna", "Hi /n/n Kindly reset your password with the following key : \n" + response.temp_key);
+                        return cb({status: 1, data: 'Mail sent'});
+                    }).catch(function(err){
+                        console.log('reset password verification key error');
+                        console.log(err);
+                        return cb({status: 0, err: "Some error occurred"});
+                    });
+                });
+            } else {
+                model.Leaders.findOne({where: {email : data.email}}).then(function(resp_l){
+                    if(resp_l) {
+                        model.ResetPasswordKeys.destroy({where: {leader_id: resp_l.id}}).then(function(){
+                            model.ResetPasswordKeys.create({
+                                temp_key : randomstring.generate(8),
+                                leader_id : resp_l.id
+                            }).then(function(response){
+                                console.log('verification key created successfully');
+                                console.log(response);
+                                mailer.sendMail('admin@techrishna.co.in', data.email, "Reset Password Techrishna", "Hi /n/n Kindly reset your password with the following key : \n" + response.temp_key);
+                                return cb({status: 1, data: 'Mail sent'});
+                            }).catch(function(err){
+                                console.log('reset password verification key error');
+                                console.log(err);
+                                return cb({status: 0, err: "Some error occurred"});
+                            });
+                        });
+                    } else {
+                        return cb({status: 0, err: "No User found"});
+                    }
+                })
+            }
         })
     }
+
 
     function encrypt(text) {
         var cipher = crypto.createCipher('aes-256-cbc', 'd6F3Efeq')

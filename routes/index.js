@@ -172,6 +172,11 @@ router.post('/reset_password', function(req, res, next) {
 		res.json(response);
 	})
 });
+router.post('/password_mail', function(req, res, next) {
+	model.Users.sendResetPasswordMail(req.body, function(response){
+		res.json(response);
+	})
+});
 
 router.post('/add_commit', function(req, res, next){
 	model.Users.add_commitment(req.body, function(response){
@@ -225,13 +230,31 @@ router.post('/delete_project', function(req, res, next){
 	model.Users.delete_project(req.body, function(response){
 		res.json(response);
 	})
-})
+});
 
 router.post('/delete_photo', function(req, res, next){
 	model.Users.delete_photo(req.body, function(response){
 		res.json(response);
 	})
-})
+});
+
+router.post('/send_mail', function(req, res, next){
+	model.Users.sendtemp(req.body, function(response){
+		res.json(response);
+	})
+});
+
+router.post('/verify_user', function(req, res, next) {
+	model.Users.verifyUser(req.body, function(response){
+		res.json(response);
+	});
+});
+
+router.post('/send_verification_mail', function(req, res, next){
+	model.Users.sendMailForVerification(req.body, function(response){
+		res.json(response);
+	});
+});
 
 
 //here create the apis
