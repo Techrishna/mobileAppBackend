@@ -91,20 +91,14 @@ module.exports = function () {
 
     this.get_leaders_data = function(data, party, cb) {
         if(party==null){
-            model.Leaders.findAll().then(function(resp){
-                if(resp) {
-                    return cb({status: 1, data : resp});
-                } else {
-                    return cb({status: 0, err: "No Record Found"});
-                }
+            sequelize.query('select leaders.*, biography.description, biography.image_url,biography.created_at as b_created_at,biography.updated_at as b_updated_at  from leaders left join biography on biography.leader_id = leaders.id').spread(function(resp, metadata){
+                var data = Sequelize.getValues(resp);
+                return cb({status: 1, data : data});
             });
         } else {
-            model.Leaders.findAll({where:{party: party}})   .then(function(resp){
-                if(resp) {
-                    return cb({status: 1, data : resp});
-                } else {
-                    return cb({status: 0, err: "No Record Found"});
-                }
+            sequelize.query('select leaders.*, biography.description, biography.image_url,biography.created_at as b_created_at,biography.updated_at as b_updated_at from leaders left join biography on biography.leader_id = leaders.id where leaders.party = "' + party + '"').spread(function(resp, metadata){
+                var data = Sequelize.getValues(resp);
+                return cb({status: 1, data : data});
             });
         }
     }
@@ -148,12 +142,10 @@ module.exports = function () {
     }
 
     this.get_leader_data_by_id = function(data, leader_id, cb) {
-        model.Leaders.findOne({where: {id: leader_id}}).then(function(resp) {
-            if(resp) {
-                return cb({status: 1, data : resp});
-            } else {
-                return cb({status: 0, err: "No record found"});
-            }
+        sequelize.query('select leaders.*, biography.description, biography.image_url,biography.created_at as b_created_at,biography.updated_at as b_updated_at from leaders left join biography on biography.leader_id = leaders.id where leader_id=' + leader_id).spread(function(resp, metadata){
+                var data = Sequelize.getValues(resp);
+                data = data[0];  
+                return cb({status: 1, data : data});
         });
     }
 
@@ -166,7 +158,6 @@ module.exports = function () {
             }
         });
     }
-    
 
     this.get_biography_data_by_id = function(data, leader_id, cb) {
         model.Biography.find({where:{leader_id: leader_id},include: [{model: model.Leaders}]}).then(function(resp) {
