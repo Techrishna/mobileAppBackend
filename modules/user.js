@@ -553,6 +553,21 @@ module.exports = function () {
         })
     }
 
+    this.edit_photo = function(data, cb) {
+        if(!data.id)
+            return cb({status:0, err: 'some error occurred'});
+        model.Photos.findOne({where:{id: data.id}}).then(function(resp){
+            if(resp) {
+                resp.title = data.title;
+                resp.video_url = data.image;
+                resp.save().then(function(){
+                    console.log("saved successfully");
+                    return cb({status:1, data: "saved"});
+                });
+            }
+        })
+    }
+
     this.get_all_news = function(data, category, cb) {
         if(category==null){
             model.News.findAll().then(function(resp){
