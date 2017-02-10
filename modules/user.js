@@ -124,7 +124,9 @@ module.exports = function () {
                             } else {
                                 return cb({status: 0, err: "Key not found"});
                             }
-                        }
+                        } else {
+                             return cb({status:0, err: "Key not found"});
+			}
                     });
                 } else {
                     return cb({status: 0, err: "User not found"});
@@ -257,7 +259,7 @@ module.exports = function () {
     }
 
     this.get_leader_data_by_id = function(data, leader_id, cb) {
-        sequelize.query('select leaders.*, biography.description, biography.image_url,biography.created_at as b_created_at,biography.updated_at as b_updated_at from leaders left join biography on biography.leader_id = leaders.id where leader_id=' + leader_id).spread(function(resp, metadata){
+        sequelize.query('select leaders.*, biography.description, biography.image_url,biography.created_at as b_created_at,biography.updated_at as b_updated_at from leaders left join biography on biography.leader_id = leaders.id where leaders.id=' + leader_id).spread(function(resp, metadata){
                 var data = Sequelize.getValues(resp);
                 data = data[0];  
                 return cb({status: 1, data : data});
