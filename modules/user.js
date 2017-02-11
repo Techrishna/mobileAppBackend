@@ -405,24 +405,37 @@ module.exports = function () {
     this.update_votes = function(data, cb) {
         if(!data.user_id || !data.leader_id)
             return cb({status:0, err: 'some error occurred'}); 
-        model.Votes.findOne({where:{user_id: data.user_id, leader_id: data.leader_id}}).then(function(resp){
-            if(!resp) {
-                model.Votes.create({
-                    created_at : new Date().getTime(),
-                    user_id : data.user_id,
-                    leader_id : data.leader_id
-                }).then(function(resp){
-                    console.log('voted successfully');
-                    return cb({status:1, data : "voted"});
-                }).catch(function(err){
-                    console.log('vote creation error');
-                    console.log(err);
-                    return cb({status: 0, err: err});
-                })
+        model.Votes.findAll({where:{user_id: data.user_id}}).then(function(resp){
+            if(resp.length == 5){
+        	return cb({status: 1, err: "You have crossed voting limit Devote and vote again"});
             } else {
-                resp.destroy().then(function(){
-                    return cb({status:1, data: "removed"});
-                });
+                 model.Votes.findOne({where:{user_id: data.user_id, leader_id: data.leader_id}}).then(function(resp){
+                     if(!resp) {
+                         model.Votes.create({
+                            created_at : new Date().getTime(),
+                            user_id : data.user_id,
+                            leader_id : data.leader_id
+                         }).then(function(resp){
+                            console.log('voted successfully');
+                            model.Votes.findAll({where:{user_id: data.user_id}}).then(function(resp){
+                                if(resp){
+                                    return cb({status: 1, data: resp.length});
+                                } else {
+		                    return cb({status:0, err: "Some error occurred"});
+                               }
+                            });
+                            //return cb({status:1, data : "voted"});
+                         }).catch(function(err){
+                              console.log('vote creation error');
+                              console.log(err);
+                              return cb({status: 0, err: err});
+                         })
+                     } else {
+                          resp.destroy().then(function(){
+                             return cb({status:1, data: "removed"});
+                          });
+                    }
+              });
             }
         });
     }
@@ -816,7 +829,7 @@ module.exports = function () {
                 }).then(function(resp) {
                     console.log('verification key created successfully');
                     console.log(resp);
-                    mailer.sendMail('admin@techrishna.co.in', data.email, "Verification Mail from Techrishna", "Hi /n/n Kindly verify your mail with the following key : \n" + resp.temp_key);
+                    mailer.sendMail('admin@techrishna.co.in', data.email, "Verification Mail from Techrishna", "Hi \n\n Kindly verify your mail with the following key : \n" + resp.temp_key);
                     return cb(null, resp);
                 }).catch(function(err) {
                     console.log('verification key creation error');
@@ -832,7 +845,7 @@ module.exports = function () {
                 }).then(function(resp) {
                     console.log('verification key created successfully');
                     console.log(resp);
-                    mailer.sendMail('admin@techrishna.co.in', data.email, "Verification Mail from Techrishna", "Hi /n/n Kindly verify your mail with the following key : \n" + resp.temp_key);
+                    mailer.sendMail('admin@techrishna.co.in', data.email, "Verification Mail from Techrishna", "Hi \n\n Kindly verify your mail with the following key : \n" + resp.temp_key);
                     return cb(null, resp);
                 }).catch(function(err) {
                     console.log('verification key creation error');
@@ -859,7 +872,7 @@ module.exports = function () {
                     }).then(function(response){
                         console.log('verification key created successfully');
                         console.log(resp);
-                        mailer.sendMail('admin@techrishna.co.in', data.email, "Reset Password Techrishna", "Hi /n/n Kindly reset your password with the following key : \n" + response.temp_key);
+                        mailer.sendMail('admin@techrishna.co.in', data.email, "Reset Password Techrishna", "Hi \n\n Kindly reset your password with the following key : \n" + response.temp_key);
                         return cb({status: 1, data: 'Mail sent'});
                     }).catch(function(err){
                         console.log('reset password verification key error');
@@ -877,7 +890,7 @@ module.exports = function () {
                             }).then(function(response){
                                 console.log('verification key created successfully');
                                 console.log(response);
-                                mailer.sendMail('admin@techrishna.co.in', data.email, "Reset Password Techrishna", "Hi /n/n Kindly reset your password with the following key : \n" + response.temp_key);
+                                mailer.sendMail('admin@techrishna.co.in', data.email, "Reset Password Techrishna", "Hi \n\n Kindly reset your password with the following key : \n" + response.temp_key);
                                 return cb({status: 1, data: 'Mail sent'});
                             }).catch(function(err){
                                 console.log('reset password verification key error');
