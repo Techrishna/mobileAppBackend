@@ -266,6 +266,14 @@ module.exports = function () {
         });
     }
 
+    this.get_leaders_data_search = function(data, query, cb) {
+        sequelize.query('select leaders.*, biography.description, biography.image_url,biography.created_at as b_created_at,biography.updated_at as b_updated_at from leaders left join biography on biography.leader_id = leaders.id where leaders.name like "%' + query + '%"').spread(function(resp, metadata){
+            var data = Sequelize.getValues(resp);
+            data = data[0];  
+            return cb({status: 1, data : data});
+        });   
+    }
+
     this.find_user_by_id = function(data, leader_id, cb) {
         model.Users.find({where:{id: leader_id}}).then(function(resp) {
             if(resp) {
