@@ -46,8 +46,8 @@ router.get('/get_leaders_data_party', function(req, res, next) {
 	});
 });
 
-router.get('/get_search_leaders', function(req, res, next) {
-	model.Users.get_leaders_data_search(req.query, req.params.party, function(response) {
+router.get('/get_search_leaders/:query', function(req, res, next) {
+	model.Users.get_leaders_data_search(req.query, req.params.query, function(response) {
 		res.json(response);
 	});
 });
