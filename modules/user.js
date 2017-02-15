@@ -258,6 +258,13 @@ module.exports = function () {
         });
     }
 
+    this.get_members_count = function(data, cb) {
+        sequelize.query('select count(*) as count, party from userpartyrels group by party').spread(function(resp, metadata){
+            var data = Sequelize.getValues(resp);
+            return cb({status: 1, data: data});
+        });
+    }
+
     this.get_leader_data_by_id = function(data, leader_id, cb) {
         sequelize.query('select leaders.*, biography.description, biography.image_url,biography.created_at as b_created_at,biography.updated_at as b_updated_at from leaders left join biography on biography.leader_id = leaders.id where leaders.id=' + leader_id).spread(function(resp, metadata){
                 var data = Sequelize.getValues(resp);
@@ -670,6 +677,40 @@ module.exports = function () {
             return cb({status: 0, err: err});
         })
     };
+
+    this.add_member_into_party = function(data, cb){
+        if(!data.user_id)
+            return cb({status: 0, err: "Some error occurred"});
+        model.UserPartyRelation.findOne({where:{user_id: data.user_id}}).then(function(resp){
+            if(resp){
+                return cb({status: 1, err: "You are member of " + resp.party});
+            } else {
+                model.UserPartyRelation.create({
+                    party : data.party,
+                    user_id : data.user_id
+                }).then(function(response){
+                    console.log('member added successfully');
+                    return cb({status:1, data : response});
+                }).catch(function(err){
+                    console.log('member addition error');
+                    console.log(err);
+                    return cb({status: 0, err: err});
+                })
+            }
+        });
+    }
+
+    this.remove_member_from_party = function(data, cb){
+        if(!data.user_id)
+            return cb({status: 0, err: "Some error occurred"});
+        model.UserPartyRelation.destroy({where:{user_id: data.user_id}}).then(function(resp){
+            if(resp){
+                return cb({status: 1, data: "deleted"});
+            } else {
+                return cb({status: 0, err: "Some error occurred"});
+            }
+        });
+    }
 
     this.edit_project = function(data, cb) {
         if(!data.id)

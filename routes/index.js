@@ -137,6 +137,12 @@ router.get('/get_leaders_home_page/:id', function(req, res, next) {
 	});
 })
 
+router.get('/get_members_count', function(req, res, next){
+	model.Users.get_members_count(req.query, function(response){
+		res.json(response);
+	});
+})
+
 router.get('/get_all_news/:id', function(req, res, next) {
 	model.Users.get_all_news(req.query, req.params.id, function(response){
 		res.json(response);
@@ -169,6 +175,18 @@ router.post('/post_complaint', function(req, res, next){
 
 router.post('/post_rating', function(req, res, next){
 	model.Users.insert_rating(req.body, function(response){
+		res.json(response);
+	});
+});
+
+router.post('/add_party_member', function(req, res, next){
+	model.Users.add_member_into_party(req.body, function(response){
+		res.json(response);
+	});
+});
+
+router.post('/remove_party_member', function(req, res, next){
+	model.Users.remove_member_from_party(req.body, function(response){
 		res.json(response);
 	});
 });

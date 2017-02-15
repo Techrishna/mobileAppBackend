@@ -44,7 +44,11 @@ var Leader = seq.define('leaders', {
         paranoid : false,
         freezeTableName : true,
         tableName: 'leaders'
+});
 
+var UserPartyRelation = seq.define('userpartyrel', {
+    id : {type: Sequelize.INTEGER, allowNull: false, primaryKey: true, autoIncrement: true},
+    party : Sequelize.TEXT('long')
 });
 
 var Commitments = seq.define('commitments', {
@@ -269,6 +273,8 @@ Rating.belongsTo(Leader, {foreignKey: "leader_id"})
 
 Suggestions.belongsTo(Leader, {foreignKey: "leader_id"})
 
+UserPartyRelation.belongsTo(User, {foreignKey: "user_id"})
+
 seq.sync();
 
 module.exports = {
@@ -288,5 +294,6 @@ module.exports = {
     News : News,
     Advertisement: Advertisement,
     ResetPasswordKeys : ResetPasswordKeys,
-    VerificationKeys : VerificationKeys
+    VerificationKeys : VerificationKeys,
+    UserPartyRelation : UserPartyRelation
 }
